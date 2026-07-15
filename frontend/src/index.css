@@ -1,20 +1,254 @@
+:root {
+  --border-color: #ccc;
+  --radius: 8px;
+  --accent: #5b3df5;
+  --accent-hover: #4a2fe0;
+  --field-padding: 12px 16px;
+  --field-font-size: 16px;
+}
+
+html,
 body {
+  height: 100%;
   margin: 0;
+  overflow: hidden;
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
 }
 
 .center {
-  min-height: 100vh;
+  height: 100vh;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 25% 25% 50%;
+  align-items: stretch;
+  padding: 48px 16px;
+}
+
+.panel {
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mode-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.mode-toggle button {
+  flex: 1;
+  padding: var(--field-padding);
+  font-size: var(--field-font-size);
+  font-family: inherit;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background: #fff;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.mode-toggle button:disabled {
+  background: #222;
+  color: #fff;
+  cursor: default;
+}
+
+.panel textarea,
+.filters select {
+  width: 100%;
+  padding: var(--field-padding);
+  font-size: var(--field-font-size);
+  font-family: inherit;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-sizing: border-box;
+}
+
+.panel textarea {
+  resize: vertical;
+  min-height: 72px;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+}
+
+.field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field span {
+  font-size: 12px;
+  color: #666;
+}
+
+.filters select {
+  flex: 1;
+}
+
+.results {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 0;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 16px;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+  }
+
+  .spacer {
+    display: none;
+  }
+
+  .panel {
+    width: 100%;
+    max-width: 480px;
+    padding-right: 0;
+  }
+
+  .results {
+    max-width: 480px;
+    margin-top: 24px;
+  }
+}
+
+.results-empty {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
 }
 
-.center input {
+.card {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.card-main {
+  flex: 0 0 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.card-title {
+  font-weight: 600;
+}
+
+.card-description {
+  flex: 1;
+  font-size: 14px;
+  color: #444;
+}
+
+.card-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: #666;
+}
+
+.card a {
+  align-self: flex-start;
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.description-toggle {
+  flex: 1;
+  align-self: flex-start;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--accent);
+  background: none;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.modal {
+  position: relative;
   width: 100%;
   max-width: 480px;
-  padding: 12px 16px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: none;
+  font-size: 20px;
+  line-height: 1;
+  color: #666;
+  cursor: pointer;
+}
+
+.search-button {
+  margin-top: 4px;
+  padding: var(--field-padding);
+  font-size: var(--field-font-size);
+  font-weight: 600;
+  font-family: inherit;
+  color: #fff;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background 0.15s ease;
+}
+
+.search-button:hover {
+  background: var(--accent-hover);
 }
