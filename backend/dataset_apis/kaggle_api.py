@@ -3,31 +3,15 @@ import os
 import re
 import tempfile
 from pathlib import Path
-
 from dotenv import load_dotenv
-
 load_dotenv()
 
-KAGGLE_CONFIG = {
-    "api_key": os.getenv("KAGGLE_API_KEY"),
-}
+from backend.dataset_apis.classify import classify_files
 
-os.environ.setdefault("KAGGLE_API_TOKEN", KAGGLE_CONFIG["api_key"] or "")
+KAGGLE_CFG = {"api_key": os.getenv("KAGGLE_API_KEY")}
+os.environ.setdefault("KAGGLE_API_TOKEN", KAGGLE_CFG["api_key"] or "")
 
 from kaggle.api.kaggle_api_extended import KaggleApi  # noqa: E402
-
-IMAGE_EXTENSIONS = {"jpg", "jpeg", "png", "gif", "bmp", "tiff"}
-VIDEO_EXTENSIONS = {"mp4", "avi", "mov", "mkv", "webm"}
-
-def classify_files(file_names):
-    extensions = {name.rsplit(".", 1)[-1].lower() for name in file_names if "." in name}
-    if extensions & VIDEO_EXTENSIONS:
-        return "Videos"
-    if extensions & IMAGE_EXTENSIONS:
-        return "Images"
-    if extensions:
-        return "Structured data"
-    return "Other"
 
 def search_kaggle(query):
     api = KaggleApi()
@@ -39,7 +23,7 @@ def search_kaggle(query):
 
         results.append({
             "title": dataset.title,
-            "description": dataset.subtitle,
+            "subtitle": dataset.subtitle,
             "file_type": classify_files(file_names),
             "license": dataset.license_name,
             "url": dataset.url,
@@ -68,8 +52,9 @@ def get_dataset_by_url(url):
 
     return {
         "title": metadata["title"],
-        "description": metadata["description"],
+        "subtitle": metadata.get("subtitle"),
         "file_type": classify_files(file_names),
         "license": licenses[0]["name"] if licenses else None,
         "url": f"https://www.kaggle.com/datasets/{ref}",
     }
+    

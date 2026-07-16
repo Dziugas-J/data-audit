@@ -16,6 +16,8 @@ app.add_middleware(
 
 class QueryRequest(BaseModel):
     query: str
+    file_type: str | None = None
+    license_class: str | None = None
 
 @app.get("/health")
 def health():
@@ -23,12 +25,9 @@ def health():
 
 @app.post("/query")
 def query(request: QueryRequest):
-    print(f"Received query: {request.query}")
 
     if "kaggle.com/datasets/" in request.query:
         return get_dataset(request.query)
 
     search_terms = refine_query(request.query)
-    print(f"Refined search terms: {search_terms}")
-
-    return search_datasets(search_terms)
+    return search_datasets(search_terms, request.file_type, request.license_class)

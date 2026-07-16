@@ -18,21 +18,25 @@ function App() {
   const [format, setFormat] = useState('Any')
   const [license, setLicense] = useState('any')
   const [results, setResults] = useState([])
-  const [selected, setSelected] = useState(null)
+  const [message, setMessage] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleSearch = () => {
     setQuery('')
+    setIsLoading(true)
 
     fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query }),
+      body: JSON.stringify({ query, file_type: format, license_class: license }),
     })
       .then((res) => res.json())
       .then((data) => {
         console.log(data)
-        setResults(Array.isArray(data) ? data : [data])
+        setResults(data.results)
+        setMessage(data.message)
       })
+      .finally(() => setIsLoading(false))
   }
 
   const handleKeyDown = (e) => {
@@ -49,16 +53,16 @@ function App() {
       <div className="panel">
         <div className="mode-toggle">
           <button type="button" onClick={() => setMode('url')} disabled={mode === 'url'}>
-            Paste URL
+            URL
           </button>
           <button type="button" onClick={() => setMode('configure')} disabled={mode === 'configure'}>
-            Describe your project
+            Describe
           </button>
         </div>
 
         <textarea
           rows={3}
-          placeholder={mode === 'url' ? 'Paste a Kaggle dataset URL' : 'Describe your project'}
+          placeholder={mode === 'url' ? 'Paste a dataset URL' : 'Describe your project'}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -90,47 +94,57 @@ function App() {
           </div>
         )}
 
-        <button type="button" className="search-button" onClick={handleSearch}>
-          Search datasets
+        <button type="button" className="search-button" onClick={handleSearch} disabled={isLoading}>
+          {isLoading ? (
+            <>
+              Loading<span className="dot">.</span><span className="dot">.</span><span className="dot">.</span>
+            </>
+          ) : (
+            'Search datasets'
+          )}
         </button>
       </div>
 
       <div className="results">
-        {results.length === 0 ? (
-          <div className="results-empty">Your results will show up here</div>
-        ) : (
-          results.slice(0, 3).map((dataset, i) => (
-            <div className="card" key={i}>
-              <div className="card-main">
-                <div className="card-title">{dataset.title}</div>
-                <div className="card-meta">
-                  <span>{dataset.file_type}</span>
-                  <span>{dataset.license}</span>
-                </div>
-                <a href={dataset.url} target="_blank" rel="noreferrer">
-                  View on Kaggle
-                </a>
-              </div>
+        {message && <div className="results-message">{message}</div>}
 
-              <button type="button" className="description-toggle" onClick={() => setSelected(dataset)}>
-                Description
-              </button>
-            </div>
-          ))
-        )}
+        <table className="results-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Subtitle</th>
+              <th>Format</th>
+              <th>License</th>
+              <th>Link</th>
+            </tr>
+          </thead>
+          <tbody>
+            {results.length === 0 ? (
+              <tr>
+                <td className="results-empty" colSpan={5}>
+                  Your results will show up here
+                </td>
+              </tr>
+            ) : (
+              results.slice(0, 3).map((dataset, i) => (
+                <tr key={i}>
+                  <td>{dataset.title}</td>
+                  <td>{dataset.subtitle}</td>
+                  <td>{dataset.file_type}</td>
+                  <td>{dataset.license}</td>
+                  <td>
+                    <a href={dataset.url} target="_blank" rel="noreferrer">
+                      View
+                    </a>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
 
-      {selected && (
-        <div className="modal-overlay" onClick={() => setSelected(null)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <button type="button" className="modal-close" onClick={() => setSelected(null)}>
-              ×
-            </button>
-            <div className="card-title">{selected.title}</div>
-            <div className="card-description">{selected.description}</div>
-          </div>
-        </div>
-      )}
+      <div className="spacer" />
     </div>
   )
 }
