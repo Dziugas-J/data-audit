@@ -26,9 +26,4 @@ def search_datasets(query, file_type=None, license_class=None):
     return {"message": message, "results": results}
 
 def get_dataset(url):
-    dataset = get_dataset_by_url(url)
-
-    similar = search_kaggle(dataset["title"])
-    similar = [r for r in similar if r["url"] != dataset["url"]]
-
-    return {"message": None, "results": [dataset] + similar[:2]}
+    return {"message": None, "results": [get_dataset_by_url(url)]}

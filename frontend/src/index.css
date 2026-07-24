@@ -55,11 +55,17 @@ body {
   color: #fff;
   cursor: default;
 }
+.panel textarea{
+  padding: var(--field-padding);
+}
+
+.filters select{
+  padding: 5px;
+}
 
 .panel textarea,
 .filters select {
   width: 100%;
-  padding: var(--field-padding);
   font-size: var(--field-font-size);
   font-family: inherit;
   border: 1px solid var(--border-color);
@@ -70,6 +76,11 @@ body {
 .panel textarea {
   resize: vertical;
   min-height: 72px;
+}
+
+.validation-error {
+  font-size: 13px;
+  color: #b91c1c;
 }
 
 .filters {
@@ -100,12 +111,33 @@ body {
   overflow-y: auto;
   list-style: none;
   margin: 0;
-  padding: 16px;
-  border: 1px dashed var(--border-color);
-  border-radius: var(--radius);
+  padding: 0 16px 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.view-toggle button {
+  flex: 1;
+  padding: var(--field-padding);
+  font-size: var(--field-font-size);
+  font-family: inherit;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  background: #fff;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.view-toggle button:disabled {
+  background: #222;
+  color: #fff;
+  cursor: default;
 }
 
 @media (max-width: 900px) {
@@ -152,6 +184,7 @@ body {
 .results-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .results-table th,
@@ -161,6 +194,7 @@ body {
   padding: 10px 12px;
   font-size: 14px;
   border-bottom: 1px solid var(--border-color);
+  overflow-wrap: break-word;
 }
 
 .results-table th {
@@ -173,8 +207,19 @@ body {
   border-bottom: none;
 }
 
-.results-table a {
+.results-table a,
+.save-button {
   color: var(--accent);
+  text-decoration: none;
+}
+
+.save-button {
+  padding: 0;
+  font-size: 14px;
+  font-family: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
 .search-button {

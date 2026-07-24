@@ -22,6 +22,7 @@ def search_kaggle(query):
         file_names = [f.name for f in api.dataset_list_files(dataset.ref).files]
 
         results.append({
+            "source": "Kaggle",
             "title": dataset.title,
             "subtitle": dataset.subtitle,
             "file_type": classify_files(file_names),
@@ -51,6 +52,7 @@ def get_dataset_by_url(url):
     licenses = metadata.get("licenses") or []
 
     return {
+        "source": "Kaggle",
         "title": metadata["title"],
         "subtitle": metadata.get("subtitle"),
         "file_type": classify_files(file_names),

@@ -1,16 +1,19 @@
 import { useState } from 'react'
 
-const API_URL = 'http://127.0.0.1:8000/query'
+const API_URL = 'http://127.0.0.1:8001/query'
 
 const FORMAT_OPTIONS = ['Any', 'Structured data', 'Images', 'Videos']
 
 const LICENSE_OPTIONS = [
-  { value: 'any', label: "Doesn't matter to me" },
-  { value: 'public_domain', label: "No restrictions - use it however you want" },
-  { value: 'attribution', label: "Free to use, just credit the creator" },
-  { value: 'share_alike', label: "Free to use, but anything you build with it must stay open too" },
-  { value: 'non_commercial', label: "Not for commercial projects" },
+  { value: 'any', label: "No preference" },
+  { value: 'public_domain', label: "Public domain" },
+  { value: 'attribution', label: "Attribution" },
+  { value: 'share_alike', label: "Share-alike" },
+  { value: 'non_commercial', label: "Non-commercial" },
 ]
+
+const isValidKaggleUrl = (text) =>
+  /^https?:\/\/(www\.)?kaggle\.com\/datasets\/[\w-]+\/[\w-]+/.test(text.trim())
 
 function App() {
   const [mode, setMode] = useState('configure')
@@ -20,9 +23,27 @@ function App() {
   const [results, setResults] = useState([])
   const [message, setMessage] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [validationError, setValidationError] = useState(null)
+  const [view, setView] = useState('search')
+  const [saved, setSaved] = useState([])
+
+  const handleSave = (dataset) => {
+    setSaved((prev) => (prev.some((d) => d.url === dataset.url) ? prev : [...prev, dataset]))
+  }
+
+  const handleRemove = (url) => {
+    setSaved((prev) => prev.filter((d) => d.url !== url))
+  }
 
   const handleSearch = () => {
+    if (mode === 'url' && !isValidKaggleUrl(query)) {
+      setValidationError('Please paste a valid dataset URL.')
+      return
+    }
+    setValidationError(null)
+
     setQuery('')
+    setView('search')
     setIsLoading(true)
 
     fetch(API_URL, {
@@ -52,10 +73,30 @@ function App() {
 
       <div className="panel">
         <div className="mode-toggle">
-          <button type="button" onClick={() => setMode('url')} disabled={mode === 'url'}>
+          <button
+            type="button"
+            onClick={() => {
+              setMode('url')
+              setQuery('')
+              setValidationError(null)
+              setFormat('Any')
+              setLicense('any')
+            }}
+            disabled={mode === 'url'}
+          >
             URL
           </button>
-          <button type="button" onClick={() => setMode('configure')} disabled={mode === 'configure'}>
+          <button
+            type="button"
+            onClick={() => {
+              setMode('configure')
+              setQuery('')
+              setValidationError(null)
+              setFormat('Any')
+              setLicense('any')
+            }}
+            disabled={mode === 'configure'}
+          >
             Describe
           </button>
         </div>
@@ -103,31 +144,45 @@ function App() {
             'Search datasets'
           )}
         </button>
+
+        {validationError && <div className="validation-error">{validationError}</div>}
       </div>
 
       <div className="results">
-        {message && <div className="results-message">{message}</div>}
+        <div className="view-toggle">
+          <button type="button" onClick={() => setView('search')} disabled={view === 'search'}>
+            Search results
+          </button>
+          <button type="button" onClick={() => setView('saved')} disabled={view === 'saved'}>
+            Saved
+          </button>
+        </div>
+
+        {view === 'search' && message && <div className="results-message">{message}</div>}
 
         <table className="results-table">
           <thead>
             <tr>
+              <th>From</th>
               <th>Title</th>
               <th>Subtitle</th>
               <th>Format</th>
               <th>License</th>
               <th>Link</th>
+              <th>Save</th>
             </tr>
           </thead>
           <tbody>
-            {results.length === 0 ? (
+            {(view === 'search' ? results : saved).length === 0 ? (
               <tr>
-                <td className="results-empty" colSpan={5}>
-                  Your results will show up here
+                <td className="results-empty" colSpan={7}>
+                  {view === 'search' ? 'Your searched datasets will appear here' : 'Your saved datasets will show up here'}
                 </td>
               </tr>
             ) : (
-              results.slice(0, 3).map((dataset, i) => (
+              (view === 'search' ? results.slice(0, 3) : saved).map((dataset, i) => (
                 <tr key={i}>
+                  <td>{dataset.source}</td>
                   <td>{dataset.title}</td>
                   <td>{dataset.subtitle}</td>
                   <td>{dataset.file_type}</td>
@@ -136,6 +191,17 @@ function App() {
                     <a href={dataset.url} target="_blank" rel="noreferrer">
                       View
                     </a>
+                  </td>
+                  <td>
+                    {view === 'search' ? (
+                      <button type="button" className="save-button" onClick={() => handleSave(dataset)}>
+                        Save
+                      </button>
+                    ) : (
+                      <button type="button" className="save-button" onClick={() => handleRemove(dataset.url)}>
+                        Remove
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))
