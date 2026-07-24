@@ -5,16 +5,13 @@ from groq import Groq
 
 load_dotenv()
 
-LLM_CONFIG = {
-    "model": "openai/gpt-oss-120b",
-    "api_key": os.getenv("GROQ_API_KEY"),
-}
+MODEL = "openai/gpt-oss-120b"
 
-client = Groq(api_key=LLM_CONFIG["api_key"])
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 def ask_llm(query: str) -> str:
     response = client.chat.completions.create(
-        model=LLM_CONFIG["model"],
+        model=MODEL,
         messages=[{"role": "user", "content": query}],
     )
     return response.choices[0].message.content

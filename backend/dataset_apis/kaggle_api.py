@@ -8,8 +8,7 @@ load_dotenv()
 
 from backend.dataset_apis.classify import classify_files
 
-KAGGLE_CFG = {"api_key": os.getenv("KAGGLE_API_KEY")}
-os.environ.setdefault("KAGGLE_API_TOKEN", KAGGLE_CFG["api_key"] or "")
+os.environ.setdefault("KAGGLE_API_TOKEN", os.getenv("KAGGLE_API_KEY") or "")
 
 from kaggle.api.kaggle_api_extended import KaggleApi  # noqa: E402
 
@@ -38,7 +37,6 @@ def extract_dataset_ref(url):
         raise ValueError(f"Not a Kaggle dataset URL: {url}")
     return match.group(1)
 
-
 def get_dataset_by_url(url):
     ref = extract_dataset_ref(url)
     api = KaggleApi()
@@ -59,4 +57,3 @@ def get_dataset_by_url(url):
         "license": licenses[0]["name"] if licenses else None,
         "url": f"https://www.kaggle.com/datasets/{ref}",
     }
-    

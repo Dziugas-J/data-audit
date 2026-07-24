@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 from backend.dataset_apis.dataset import get_dataset, search_datasets
 from backend.llm import refine_query
+from backend.saved_datasets import delete_dataset, get_saved_datasets, save_dataset
 
 app = FastAPI()
 
@@ -19,6 +20,17 @@ class QueryRequest(BaseModel):
     file_type: str | None = None
     license_class: str | None = None
 
+class SaveRequest(BaseModel):
+    source: str | None = None
+    title: str
+    subtitle: str | None = None
+    file_type: str | None = None
+    license: str | None = None
+    url: str
+
+class DeleteRequest(BaseModel):
+    url: str
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
@@ -31,3 +43,17 @@ def query(request: QueryRequest):
 
     search_terms = refine_query(request.query)
     return search_datasets(search_terms, request.file_type, request.license_class)
+
+@app.post("/saved")
+def save(request: SaveRequest):
+    save_dataset(request.model_dump())
+    return {"message": None, "results": get_saved_datasets()}
+
+@app.get("/saved")
+def saved():
+    return {"message": None, "results": get_saved_datasets()}
+
+@app.delete("/saved")
+def remove_saved(request: DeleteRequest):
+    delete_dataset(request.url)
+    return {"message": None, "results": get_saved_datasets()}
