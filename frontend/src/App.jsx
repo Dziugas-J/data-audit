@@ -1,7 +1,5 @@
 import { useState } from 'react'
-
-const API_URL = 'http://127.0.0.1:8001/query'
-const SAVED_URL = 'http://127.0.0.1:8001/saved'
+import { fetchSavedDatasets, removeDataset, saveDataset, searchDatasets } from './api'
 
 const FORMAT_OPTIONS = ['Any', 'Structured data', 'Images', 'Videos']
 
@@ -27,34 +25,30 @@ function App() {
   const [validationError, setValidationError] = useState(null)
   const [view, setView] = useState('search')
   const [saved, setSaved] = useState([])
+  const [error, setError] = useState(null)
 
   const handleSave = (dataset) => {
-    fetch(SAVED_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(dataset),
-    })
-      .then((res) => res.json())
+    setError(null)
+    saveDataset(dataset)
       .then((data) => {
         setSaved(data.results)
         setResults((prev) => prev.filter((d) => d.url !== dataset.url))
       })
+      .catch(() => setError('Could not save this dataset. Please try again.'))
   }
 
   const fetchSaved = () => {
-    fetch(SAVED_URL)
-      .then((res) => res.json())
+    setError(null)
+    fetchSavedDatasets()
       .then((data) => setSaved(data.results))
+      .catch(() => setError('Could not load saved datasets. Please try again.'))
   }
 
   const handleRemove = (url) => {
-    fetch(SAVED_URL, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url }),
-    })
-      .then((res) => res.json())
+    setError(null)
+    removeDataset(url)
       .then((data) => setSaved(data.results))
+      .catch(() => setError('Could not remove this dataset. Please try again.'))
   }
 
   const handleSearch = () => {
@@ -67,17 +61,15 @@ function App() {
       return
     }
     setValidationError(null)
+    setError(null)
+    setResults([])
+    setMessage(null)
 
     setQuery('')
     setView('search')
     setIsLoading(true)
 
-    fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query, file_type: format, license_class: license }),
-    })
-      .then((res) => res.json())
+    searchDatasets(query, format, license)
       .then((data) => {
         const freshResults = data.results.filter(
           (dataset) => !saved.some((d) => d.url === dataset.url)
@@ -85,6 +77,7 @@ function App() {
         setResults(freshResults.slice(0, 5))
         setMessage(data.message)
       })
+      .catch(() => setError('Something went wrong searching for datasets. Please try again.'))
       .finally(() => setIsLoading(false))
   }
 
@@ -182,6 +175,7 @@ function App() {
         </div>
 
         {view === 'search' && message && <div className="results-message">{message}</div>}
+        {error && <div className="error-message">{error}</div>}
 
         <div className="table-scroll">
           <table className="results-table">

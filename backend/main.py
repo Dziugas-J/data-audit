@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from backend.dataset_apis.dataset import get_dataset, search_datasets
-from backend.llm import refine_query
+from backend.llm import broaden_query, refine_query
 from backend.saved_datasets import delete_dataset, get_saved_datasets, save_dataset
 
 app = FastAPI()
@@ -42,7 +42,15 @@ def query(request: QueryRequest):
         return get_dataset(request.query)
 
     search_terms = refine_query(request.query)
-    return search_datasets(search_terms, request.file_type, request.license_class)
+    result = search_datasets(search_terms, request.file_type, request.license_class)
+
+    if not result["results"]:
+        broader_terms = broaden_query(request.query)
+        result = search_datasets(broader_terms, request.file_type, request.license_class)
+        if result["results"]:
+            result["message"] = "No exact matches found. Showing results for a broader topic instead."
+
+    return result
 
 @app.post("/saved")
 def save(request: SaveRequest):

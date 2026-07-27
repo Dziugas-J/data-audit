@@ -5,3 +5,5 @@ groq
 kaggle
 sqlalchemy
 pymysql
+sentence-transformers
+requests

@@ -179,6 +179,16 @@ body {
   border-radius: var(--radius);
 }
 
+.error-message {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #b91c1c;
+  background: #fdecea;
+  border: 1px solid #f5c6cb;
+  border-radius: var(--radius);
+}
+
 .results-empty {
   text-align: center;
   color: #888;
