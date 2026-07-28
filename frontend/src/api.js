@@ -1,5 +1,6 @@
-const API_URL = 'http://127.0.0.1:8001/query'
-const SAVED_URL = 'http://127.0.0.1:8001/saved'
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8002'
+const API_URL = `${BASE_URL}/query`
+const SAVED_URL = `${BASE_URL}/saved`
 
 const fetchJson = (url, options) =>
   fetch(url, options).then((res) => {

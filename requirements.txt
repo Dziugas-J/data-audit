@@ -4,6 +4,6 @@ python-dotenv
 groq
 kaggle
 sqlalchemy
-pymysql
+psycopg2-binary
 sentence-transformers
 requests

@@ -7,10 +7,16 @@ from sqlalchemy.sql import func
 
 load_dotenv()
 
-DB_URL = (
-    f"mysql+pymysql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
-    f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
-)
+DATABASE_URL = os.getenv("DATABASE_URL")
+if DATABASE_URL:
+    # Render (and most hosts) give a single postgresql:// URL - SQLAlchemy
+    # needs the +psycopg2 driver suffix to pick the right dialect.
+    DB_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
+else:
+    DB_URL = (
+        f"postgresql+psycopg2://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
+        f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+    )
 
 engine = create_engine(DB_URL)
 Session = sessionmaker(bind=engine)
