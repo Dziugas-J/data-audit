@@ -1,6 +1,6 @@
 # Data Audit
 
-Finding the right Kaggle dataset is often harder than building with it, especially when you do not know the exact keywords Kaggle expects. This project lets you describe your project in plain English, then uses an LLM to generate an effective Kaggle search query and semantic ranking to surface the datasets that best match your actual intent. You can also inspect a specific dataset by pasting its Kaggle URL.
+Finding the right dataset is often harder than building with it, especially when you do not know what you need. This project lets you describe your project in plain English, then uses an LLM to generate an effective Kaggle search query and semantic ranking to surface the datasets that best match your actual intent. You can also inspect a specific dataset by pasting its URL.
 
 As of now it can only return Kaggle's database, but the system is code-friendly for introducing more databases.
 
@@ -56,10 +56,10 @@ Takes a bit of time to run the first time, since it's running on free version of
 <img src="./screenshots/url.png" alt="Game board" width="700">
 
 # Choosing data format
-<img src="./screenshots/data format.png" alt="Game board" width="700">
+<img src="./screenshots/data format.png" alt="Game board" width="200">
 
 # Choosing license
-<img src="./screenshots/license.png" alt="Game board" width="700">
+<img src="./screenshots/license.png" alt="Game board" width="200">
 
 ## What could be improved
 
